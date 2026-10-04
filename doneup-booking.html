@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Done Up by Rissa — Book Your Appointment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page-bg:#3a1f26;
+    --bg:#1a0a17;
+    --surface:#220d1e;
+    --surface-2:#2b1326;
+    --rose:#e9c9c4;
+    --rose-soft:#c9a39d;
+    --ink:#f3e9e4;
+    --ink-muted:#c3aaa6;
+    --ink-faint:#8f7470;
+    --grey-btn:#8a8482;
+    --grey-btn-dark:#6f6a68;
+    --hairline:rgba(243,233,228,0.12);
+    --serif:'Cormorant', 'Georgia', serif;
+    --sans:'Karla', 'Helvetica Neue', Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+  .reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+  body{
+    margin:0;
+    background:var(--page-bg);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:18px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--rose); color:#1a0a17; }
+  a{ color:inherit; }
+  .panel{ max-width:860px; margin:0 auto; background:var(--bg); }
+  .wrap{ max-width:720px; margin:0 auto; padding:0 28px; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:64px 28px 48px;
+    text-align:center;
+    overflow:hidden;
+    background:radial-gradient(60% 50% at 50% 0%, rgba(233,201,196,0.08), transparent 70%);
+  }
+  .hero-eyebrow{
+    font-family:var(--sans); font-size:11px; letter-spacing:0.3em; color:var(--ink-faint);
+    margin-bottom:22px; font-weight:600; text-transform:uppercase;
+    opacity:0; animation:fadeUp .7s ease .1s forwards;
+  }
+  .hero-word{
+    font-family:var(--serif); font-style:italic; font-weight:500;
+    font-size:clamp(44px,10vw,74px); line-height:1.02; margin:0;
+    color:var(--ink);
+    opacity:0; animation:fadeUp .8s ease .22s forwards;
+  }
+  .hero-word em{ color:var(--rose); font-style:normal; }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:translateY(0); } }
+  .hero-rule{
+    width:70px; height:1px; background:var(--rose-soft); margin:26px auto;
+    opacity:0; animation:fadeUp .7s ease .36s forwards;
+  }
+  .hero-tag{
+    font-family:var(--sans); font-size:12.5px; letter-spacing:0.18em; color:var(--ink-muted);
+    text-transform:uppercase; margin:0 0 34px;
+    opacity:0; animation:fadeUp .7s ease .46s forwards;
+  }
+  .hero-cta{ opacity:0; animation:fadeUp .7s ease .56s forwards; }
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    font-family:var(--sans); font-size:12.5px; font-weight:700; letter-spacing:0.08em;
+    color:var(--bg); text-decoration:none; padding:15px 32px; border:none; border-radius:2px;
+    background:var(--rose); cursor:pointer; transition:transform .2s ease, background .2s ease;
+    text-transform:uppercase;
+  }
+  .btn:hover{ transform:translateY(-1px); background:#f3dcd7; }
+  .btn:active{ transform:translateY(0); }
+  .btn-outline{ background:transparent; color:var(--ink); border:1px solid var(--hairline); }
+  .btn-outline:hover{ border-color:var(--rose-soft); background:transparent; }
+
+  /* ---------- INTRO ---------- */
+  .intro{ padding:10px 0 6px; text-align:center; }
+  .intro p{
+    font-style:italic; font-size:clamp(18px,2.4vw,21px); color:var(--ink);
+    max-width:520px; margin:0 auto; line-height:1.75;
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section.menu-section{ padding:50px 0; border-top:1px solid var(--hairline); }
+  .section-title{
+    font-style:italic; font-weight:500; font-size:clamp(28px,4.4vw,36px);
+    color:var(--ink); margin:0 0 6px; line-height:1.1;
+  }
+  .section-title em{ font-style:normal; color:var(--rose); }
+  .section-desc{ color:var(--ink-muted); font-size:15.5px; max-width:480px; margin:0 0 26px; font-family:var(--sans); }
+
+  /* ---------- CATEGORY ACCORDION ---------- */
+  details.cat{ border-bottom:1px solid var(--hairline); }
+  details.cat:first-of-type{ border-top:1px solid var(--hairline); }
+  details.cat summary{
+    list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+    padding:20px 0; font-style:italic; font-size:21px; color:var(--ink);
+  }
+  details.cat summary::-webkit-details-marker{ display:none; }
+  details.cat summary .count{
+    font-family:var(--sans); font-style:normal; font-size:11.5px; letter-spacing:0.04em;
+    color:var(--ink-faint); font-weight:400; margin-right:auto; margin-left:12px; text-transform:none;
+  }
+  details.cat summary .plus{
+    font-family:var(--sans); font-size:20px; font-weight:300; color:var(--rose-soft);
+    transition:transform .3s ease; flex:0 0 auto;
+  }
+  details.cat[open] summary .plus{ transform:rotate(45deg); }
+  .cat-body{ padding:0 0 22px; }
+  .cat-note{ font-size:14px; font-family:var(--sans); color:var(--ink-faint); font-style:normal; margin:0 0 16px; }
+  .cat-soon{
+    font-family:var(--sans); font-size:13.5px; color:var(--ink-faint); font-style:normal;
+    border:1px dashed var(--hairline); padding:16px 18px; border-radius:2px; line-height:1.6;
+  }
+
+  /* ---------- SERVICE ROWS ---------- */
+  .svc{ padding:18px 0; border-top:1px dotted var(--hairline); }
+  .svc:first-child{ border-top:none; }
+  .svc-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
+  .svc-name-wrap{ min-width:0; }
+  .svc-name{ font-size:19.5px; font-weight:500; color:var(--ink); }
+  .svc-time{ font-family:var(--sans); font-size:11px; letter-spacing:0.05em; color:var(--ink-faint); margin-top:4px; text-transform:uppercase; }
+  .svc-right{ flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  .svc-price{ font-family:var(--sans); font-size:15px; color:var(--rose); font-weight:700; white-space:nowrap; }
+  .select-btn{
+    font-family:var(--sans); font-size:10.5px; letter-spacing:0.06em; font-weight:700; text-transform:uppercase;
+    color:var(--bg); background:var(--grey-btn); border:none; border-radius:2px; padding:8px 16px;
+    cursor:pointer; white-space:nowrap;
+  }
+  .select-btn:hover{ background:var(--ink); }
+  .svc-desc{ margin-top:9px; color:var(--ink-muted); font-size:15px; line-height:1.6; max-width:520px; font-family:var(--serif); }
+  .svc-flag{
+    display:inline-block; margin-top:8px; font-family:var(--sans); font-size:10px;
+    letter-spacing:0.04em; color:var(--rose-soft); border:1px solid rgba(201,163,157,0.35);
+    padding:4px 10px; border-radius:2px; text-transform:uppercase;
+  }
+
+  /* ---------- POLICY ACCORDION ---------- */
+  details.acc{ border-bottom:1px solid var(--hairline); }
+  details.acc:first-of-type{ border-top:1px solid var(--hairline); }
+  details.acc summary{
+    list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+    padding:20px 0; font-style:italic; font-size:19px; color:var(--ink);
+  }
+  details.acc summary::-webkit-details-marker{ display:none; }
+  details.acc summary .plus{
+    font-family:var(--sans); font-size:20px; font-weight:300; color:var(--rose-soft);
+    transition:transform .3s ease; flex:0 0 auto; margin-left:16px;
+  }
+  details.acc[open] summary .plus{ transform:rotate(45deg); }
+  .acc-body{ padding:0 0 22px; color:var(--ink-muted); font-size:15.5px; line-height:1.75; }
+  .acc-body p{ margin:0 0 10px; }
+
+  /* ---------- LOYALTY BAND ---------- */
+  .loyalty-band{
+    text-align:center; padding:16px 20px; margin:0;
+    background:var(--surface-2);
+    font-family:var(--sans); font-size:12px; letter-spacing:0.14em; color:var(--rose);
+    text-transform:uppercase; font-weight:600;
+  }
+
+  /* ---------- HOURS / LOCATION ---------- */
+  .hours-row{ display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px dotted var(--hairline); font-size:16px; }
+  .hours-row:last-child{ border-bottom:none; }
+  .hours-row span:first-child{ color:var(--ink-muted); }
+  .hours-row span:last-child{ color:var(--ink); font-weight:500; }
+
+  /* ---------- CTA BAND ---------- */
+  .cta-band{ padding:64px 0 56px; text-align:center; }
+  .cta-band p{ color:var(--ink-muted); max-width:420px; margin:0 auto 26px; font-family:var(--sans); font-size:14px; }
+  .link-fallback{ display:block; text-align:center; margin-top:18px; font-family:var(--sans); font-size:11.5px; color:var(--ink-faint); }
+  .link-fallback a{ color:var(--ink-faint); text-decoration:underline; text-underline-offset:2px; }
+  .link-fallback a:hover{ color:var(--rose); }
+
+  /* ---------- FOOTER ---------- */
+  footer{ padding:44px 0 120px; text-align:center; }
+  footer .foot-word{ font-style:italic; font-size:26px; color:var(--rose); margin-bottom:10px; }
+  footer .foot-links{
+    font-family:var(--sans); font-size:12px; letter-spacing:0.03em; color:var(--ink-faint);
+    display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin-bottom:16px; text-transform:uppercase;
+  }
+  footer .foot-links a{ text-decoration:none; border-bottom:1px solid transparent; }
+  footer .foot-links a:hover{ border-color:var(--rose); color:var(--rose); }
+  footer .foot-note{ font-family:var(--sans); font-size:11px; color:var(--ink-faint); opacity:0.75; }
+
+  /* ---------- STICKY MOBILE BAR ---------- */
+  .sticky-bar{ display:none; }
+  @media (max-width:640px){
+    .sticky-bar{
+      display:flex; position:fixed; left:0; right:0; bottom:0; z-index:40;
+      padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+      background:rgba(26,10,23,0.97);
+      border-top:1px solid var(--hairline); backdrop-filter:blur(6px);
+    }
+    .sticky-bar .btn{ width:100%; }
+    body{ padding-bottom:74px; }
+  }
+
+  /* ---------- BOOKING OVERLAY / MODAL ---------- */
+  .booking-overlay{
+    position:fixed; inset:0; z-index:100; display:none; align-items:flex-end; justify-content:center;
+    background:rgba(10,4,9,0.78); backdrop-filter:blur(3px);
+  }
+  .booking-overlay.open{ display:flex; }
+  @media (min-width:640px){ .booking-overlay{ align-items:center; padding:24px; } }
+  .booking-modal{
+    position:relative; width:100%; max-width:520px; max-height:92svh; overflow-y:auto;
+    background:var(--surface); border:1px solid var(--hairline);
+    box-shadow:0 -10px 60px rgba(0,0,0,0.3);
+    border-radius:6px 6px 0 0; padding:26px 24px 32px;
+    font-family:var(--serif);
+  }
+  @media (min-width:640px){ .booking-modal{ border-radius:6px; padding:32px 34px 36px; } }
+  .modal-close{
+    position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:50%;
+    border:1px solid var(--hairline); background:transparent; color:var(--ink-muted);
+    font-size:18px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .modal-close:hover{ color:var(--rose); border-color:var(--rose-soft); }
+  .modal-service{ font-family:var(--sans); font-size:10.5px; letter-spacing:0.1em; color:var(--ink-faint); margin-bottom:4px; text-transform:uppercase; }
+  .modal-service strong{ display:block; font-style:italic; font-size:21px; color:var(--ink); margin-top:4px; font-weight:500; }
+  .modal-service .change-svc{ font-size:11px; color:var(--rose); cursor:pointer; text-decoration:underline; text-underline-offset:2px; margin-left:8px; font-family:var(--sans); font-style:normal; }
+
+  .step-progress{ display:flex; gap:6px; margin:18px 0 22px; }
+  .step-progress .dot{ height:3px; flex:1; border-radius:3px; background:var(--hairline); }
+  .step-progress .dot.done{ background:var(--rose); }
+  .step-title{ font-style:italic; font-weight:500; font-size:19px; color:var(--ink); margin:0 0 16px; }
+  .back-link{ font-family:var(--sans); font-size:12px; color:var(--ink-faint); cursor:pointer; display:inline-block; margin-bottom:14px; }
+  .back-link:hover{ color:var(--rose); }
+
+  .addon-list{ display:flex; flex-direction:column; gap:12px; margin-bottom:8px; }
+  .addon-item{
+    display:flex; align-items:flex-start; gap:12px; border:1px solid var(--hairline); border-radius:4px;
+    padding:12px 14px; cursor:pointer; font-family:var(--sans);
+  }
+  .addon-item input{ margin-top:3px; accent-color:var(--rose); }
+  .addon-item .addon-name{ font-size:14px; color:var(--ink); font-weight:600; }
+  .addon-item .addon-meta{ font-size:11.5px; color:var(--ink-faint); margin-top:2px; }
+
+  .date-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch; }
+  .date-chip{
+    flex:0 0 auto; width:58px; padding:10px 0; text-align:center;
+    border:1px solid var(--hairline); border-radius:4px; background:var(--surface-2); cursor:pointer;
+    font-family:var(--sans);
+  }
+  .date-chip .dow{ font-size:10px; letter-spacing:0.06em; color:var(--ink-faint); }
+  .date-chip .dom{ font-size:16px; color:var(--ink); font-weight:600; margin-top:2px; }
+  .date-chip.closed{ opacity:0.35; cursor:not-allowed; }
+  .date-chip.selected{ border-color:var(--rose); background:var(--rose); }
+  .date-chip.selected .dow, .date-chip.selected .dom{ color:var(--bg); }
+
+  .time-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; font-family:var(--sans); }
+  @media (min-width:420px){ .time-grid{ grid-template-columns:repeat(4,1fr); } }
+  .time-slot{
+    padding:10px 4px; text-align:center; border:1px solid var(--hairline); border-radius:4px;
+    background:var(--surface-2); color:var(--ink); font-size:12.5px; cursor:pointer;
+  }
+  .time-slot:hover{ border-color:var(--rose-soft); }
+  .time-slot.selected{ border-color:var(--rose); background:var(--rose); color:var(--bg); }
+  .time-slot.taken{ opacity:0.3; text-decoration:line-through; cursor:not-allowed; background:transparent; }
+  .time-empty{ font-style:italic; color:var(--ink-muted); padding:20px 0; text-align:center; }
+  .waitlist-note{ text-align:center; margin-top:14px; font-family:var(--sans); font-size:12.5px; color:var(--ink-faint); }
+  .waitlist-note button{ background:none; border:none; color:var(--rose); text-decoration:underline; cursor:pointer; font-family:var(--sans); font-size:12.5px; padding:0; }
+
+  .field{ margin-bottom:15px; font-family:var(--sans); }
+  .field label{ display:block; font-size:10.5px; letter-spacing:0.06em; color:var(--ink-faint); margin-bottom:6px; text-transform:uppercase; }
+  .field input, .field textarea{
+    width:100%; background:var(--surface-2); border:1px solid var(--hairline); border-radius:4px;
+    padding:12px 14px; font-family:var(--sans); font-size:15px; color:var(--ink);
+  }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--rose-soft); }
+  .field textarea{ resize:vertical; min-height:60px; }
+
+  .summary-box{
+    background:var(--surface-2); border:1px solid var(--hairline); border-radius:4px;
+    padding:15px 17px; margin-bottom:18px; font-family:var(--sans); font-size:13px; color:var(--ink-muted);
+  }
+  .summary-box .row{ display:flex; justify-content:space-between; padding:4px 0; }
+  .summary-box .row strong{ color:var(--ink); font-weight:600; }
+  .summary-box .row.total{ border-top:1px solid var(--hairline); margin-top:6px; padding-top:8px; }
+  .summary-box .row.total strong{ color:var(--rose); }
+
+  .confirm-check{
+    width:54px; height:54px; border-radius:50%; border:1px solid var(--rose);
+    display:flex; align-items:center; justify-content:center; margin:6px auto 18px;
+  }
+  .confirm-wrap{ text-align:center; }
+  .confirm-wrap .step-title{ text-align:center; }
+  .confirm-actions{ display:flex; flex-direction:column; gap:10px; margin-top:20px; }
+  .form-error{ font-family:var(--sans); font-size:12px; color:#f0a; margin:-6px 0 14px; display:none; }
+  .form-error.show{ display:block; }
+</style>
+</head>
+<body>
+
+  <div class="panel">
+    <section class="hero">
+      <div class="hero-eyebrow">Luxury Hair &middot; By Appointment Only</div>
+      <h1 class="hero-word">Done Up <em>by Rissa</em></h1>
+      <div class="hero-rule"></div>
+      <p class="hero-tag">Premium Bundles &middot; Sew-Ins &middot; Quickweaves</p>
+      <div class="hero-cta"><a class="btn" href="#services">View Services &amp; Book</a></div>
+    </section>
+
+    <div class="wrap">
+      <div class="intro reveal">
+        <p>Every set starts with premium, hand-selected hair and ends with a finish made to last — booked online, done up right.</p>
+      </div>
+    </div>
+
+    <div class="loyalty-band">Become a loyal doll today — ask about rewards for repeat bookings</div>
+
+    <div class="wrap">
+      <section class="menu-section reveal" id="services">
+        <h2 class="section-title">Service <em>Menu</em></h2>
+        <p class="section-desc">Tap a category to see what's inside, then select a service to check open times.</p>
+
+        <details class="cat" open>
+          <summary>Hair Included Packages <span class="count">8 services</span><span class="plus">+</span></summary>
+          <div class="cat-body">
+            <p class="cat-note">Premium virgin or raw hair bundles, included with your sew-in or quickweave service. Clients must specify a texture — Body Wave or Straight — in the booking notes; failure to do so defaults to Body Wave.</p>
+
+            <div class="svc">
+              <div class="svc-top">
+                <div class="svc-name-wrap"><span class="svc-name">20"–24" Bundle Set</span><div class="svc-time">2 HR 30 MIN</div></div>
+                <div class="svc-right"><span class="svc-price">$495</span><button class="select-btn" data-id="bundle-20-24">Select</button></div>
+              </div>
+              <p class="svc-desc">Luxury virgin bundle set in lengths 20"–24", paired with a sew-in or quickweave. Maintains its quality for 3–5 years, with long-lasting softness, fullness, and a luxury finish.</p>
+              <span class="svc-flag">Book at least 2 days ahead</span>
+            </div>
+
+            <div class="svc">
+              <div class="svc-top">
+                <div class="svc-name-wrap"><span class="svc-name">18" 18" 18" Bundle Set</span><div class="svc-time">2 HR 30 MIN</div></div>
+                <div class="svc-right"><span class="svc-price">$380</span><button class="select-btn" data-id="bundle-18-18-18">Select</button></div>
+              </div>
+              <p class="svc-desc">Three premium virgin hair bundles at 18", paired with a sew-in or quickweave. Long-lasting softness, fullness, and a luxury finish.</p>
+              <span class="svc-flag">Book at least 2 days ahead</span>
+            </div>
+
+            <div class="svc">
+              <div class="svc-top">
+                <div class="svc-name-wrap"><span class="svc-name">18"–22" Bundle Set</span><div class="svc-time">2 HR 30 MIN</div></div>
+                <div class="svc-right"><span class="svc-price">$465</span><button class="select-btn" data-id="bundle-18-22">Select</button></div>
+              </div>
+              <p class="svc-desc">Premium virgin hair bundles in lengths 18"–22", paired with a sew-in or quickweave. Long-lasting softness, fullness, and a luxury finish.</p>
+              <span class="svc-flag">Book at least 2 days ahead</span>
+            </div>
+
+            <div class="svc">
+              <div class="svc-top">
+                <div class="svc-name-wrap"><span class="svc-name">22"–26" Bundle Set</span><div class="svc-time">2 HR 30 MIN</div></div>
+                <div class="svc-right"><span class="svc-price">$525</span><button class="select-btn" data-id="bundle-22-26">Select</button></div>
+              </div>
+              <p class="svc-desc">Premium virgin hair bundles in lengths 22"–26", paired with a sew-in or quickweave. Select add-ons at checkout.</p>
+              <span class="svc-flag">Book at least 2 days ahead</span>
+            </div>
+
+            <div class="svc">
+              <div class="svc-top">
+                <div class="svc-name-wrap"><span class="svc-name">18" 18" 18" Raw Heiress Wavy</span><div class="svc-time">3 HOURS</div></div>
+                <div class="svc-right"><span class="svc-price">$692</span><button class="select-btn" data-id="raw-wavy-181818">Select</button></div>
+              </div>
+              <p class="svc-desc">Thick, full raw bundles sourced directly from single donors, with a natural hair wash and stretch, finished with your choice of sew-in or quickweave. Incredibly versatile — wear it in its natural soft wave, straighten it sleek, or curl it for voluminous glam.</p>
+            </div>
+
+            <div class="svc">
+              <div class="svc-top">
+                <div class="svc-name-wrap"><span class="svc-name">20" 22" 24" Raw Heiress Wavy</span><div class="svc-time">3 HOURS</div></div>
+                <div class="svc-right"><span class="svc-price">$779</span><button class="select-btn" data-id="raw-wavy-202224">Select</button></div>
+              </div>
+              <p class="svc-desc">Thick, full raw bundles sourced directly from single donors, natural hair wash and stretch, your choice of sew-in or quickweave. Wear it wavy, straight, or curled.</p>
+            </div>
+
+            <div class="svc">
+              <div class="svc-top">
+                <div class="svc-name-wrap"><span class="svc-name">24" 26" 28" Raw Heiress Wavy</span><div class="svc-time">3 HOURS</div></div>
+                <div class="svc-right"><span class="svc-price">$884</span><button class="select-btn" data-id="raw-wavy-242628">Select</button></div>
+              </div>
+              <p class="svc-desc">Thick, full raw bundles sourced directly from single donors, natural hair wash and stretch, your choice of sew-in or quickweave. Wear it wavy, straight, or curled.</p>
+            </div>
+
+            <div class="svc">
+              <div class="svc-top">
+                <div class="svc-name-wrap"><span class="svc-name">20" 22" 24" Raw Heiress Curl</span><div class="svc-time">3 HOURS</div></div>
+                <div class="svc-right"><span class="svc-price">$798</span><button class="select-btn" data-id="raw-curl-202224">Select</button></div>
+              </div>
+              <p class="svc-desc">Raw Indian Curly bundles for the most volume and texture in a full, statement look. Wear it in natural defined curls, brushed soft and voluminous, or styled for a variety of curly looks with movement.</p>
+            </div>
+          </div>
+        </details>
+
+        <details class="cat">
+          <summary>The DONEUP Luxe Collection <span class="count">details coming soon</span><span class="plus">+</span></summary>
+          <div class="cat-body">
+            <div class="cat-soon">Rissa — send over the services, prices, and durations for this category and I'll drop them right in.</div>
+          </div>
+        </details>
+
+        <details class="cat">
+          <summary>Sew Ins <span class="count">details coming soon</span><span class="plus">+</span></summary>
+          <div class="cat-body">
+            <div class="cat-soon">Rissa — send over the services, prices, and durations for this category and I'll drop them right in.</div>
+          </div>
+        </details>
+
+        <details class="cat">
+          <summary>QuickWeave <span class="count">details coming soon</span><span class="plus">+</span></summary>
+          <div class="cat-body">
+            <div class="cat-soon">Rissa — send over the services, prices, and durations for this category and I'll drop them right in.</div>
+          </div>
+        </details>
+      </section>
+
+      <!-- POLICY -->
+      <section class="menu-section reveal" id="policy">
+        <h2 class="section-title">Booking <em>Policies</em></h2>
+
+        <details class="acc" open>
+          <summary>Booking windows &amp; surcharges<span class="plus">+</span></summary>
+          <div class="acc-body">
+            <p>Luxury bundle sets must be booked at least 2 days in advance.</p>
+            <p>Need an earlier or later start? An 8AM Morning Luxe Appointment adds $50, and a 5PM After Hours Appointment adds $65 — both available as add-ons when you book.</p>
+          </div>
+        </details>
+
+        <details class="acc">
+          <summary>Lace drop-offs<span class="plus">+</span></summary>
+          <div class="acc-body">
+            <p>Lace drop-offs are accepted 11 AM – 5 PM on business days.</p>
+          </div>
+        </details>
+
+        <details class="acc">
+          <summary>Before you book<span class="plus">+</span></summary>
+          <div class="acc-body">
+            <p>Please read through all policies before booking your appointment.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- HOURS -->
+      <section class="menu-section reveal" id="visit">
+        <h2 class="section-title">Hours</h2>
+        <div class="hours-row"><span>Sunday</span><span>Closed</span></div>
+        <div class="hours-row"><span>Monday</span><span>Closed</span></div>
+        <div class="hours-row"><span>Tuesday</span><span>12:00 PM – 7:00 PM</span></div>
+        <div class="hours-row"><span>Wednesday</span><span>10:00 AM – 7:00 PM</span></div>
+        <div class="hours-row"><span>Thursday</span><span>10:00 AM – 7:00 PM</span></div>
+        <div class="hours-row"><span>Friday</span><span>10:00 AM – 7:00 PM</span></div>
+        <div class="hours-row"><span>Saturday</span><span>10:00 AM – 5:00 PM</span></div>
+      </section>
+
+      <div class="cta-band reveal">
+        <h2 class="section-title">Ready when <em>you are</em></h2>
+        <p>Pick a service above to see open times and lock in your spot.</p>
+        <a class="btn" href="#services">View Services &amp; Book</a>
+      </div>
+    </div>
+
+    <footer>
+      <div class="foot-word">Done Up by Rissa</div>
+      <div class="foot-links">
+        <span>By Appointment Only</span>
+      </div>
+      <div class="foot-note">Booking handled securely through Acuity Scheduling.</div>
+    </footer>
+
+    <div class="sticky-bar">
+      <a class="btn" href="#services">Book Now</a>
+    </div>
+  </div>
+
+  <!-- ================= BOOKING MODAL ================= -->
+  <div class="booking-overlay" id="bookingOverlay" aria-hidden="true">
+    <div class="booking-modal" role="dialog" aria-modal="true" aria-labelledby="modalServiceName">
+      <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+
+      <div class="modal-service">
+        SELECTED SERVICE <span class="change-svc" id="changeService">change</span>
+        <strong id="modalServiceName">—</strong>
+      </div>
+
+      <div class="step-progress">
+        <div class="dot" data-dot="1"></div>
+        <div class="dot" data-dot="2"></div>
+        <div class="dot" data-dot="3"></div>
+        <div class="dot" data-dot="4"></div>
+        <div class="dot" data-dot="5"></div>
+      </div>
+
+      <div class="modal-step" id="stepAddons">
+        <h3 class="step-title">Add to Your Appointment</h3>
+        <div class="addon-list" id="bundleAddonList"></div>
+        <div class="addon-list" id="universalAddonList">
+          <label class="addon-item">
+            <input type="checkbox" data-addon="morning-luxe">
+            <div><div class="addon-name">8AM Morning Luxe Appointment</div><div class="addon-meta">+$50.00</div></div>
+          </label>
+          <label class="addon-item">
+            <input type="checkbox" data-addon="after-hours">
+            <div><div class="addon-name">5PM After Hours Appointment</div><div class="addon-meta">+$65.00</div></div>
+          </label>
+        </div>
+        <button class="btn" id="addonsContinue" style="width:100%; margin-top:6px;">Continue</button>
+      </div>
+
+      <div class="modal-step" id="stepDate" hidden>
+        <span class="back-link" data-back="stepAddons">&larr; Back</span>
+        <h3 class="step-title">Pick a Date</h3>
+        <div class="date-row" id="dateRow"></div>
+      </div>
+
+      <div class="modal-step" id="stepTime" hidden>
+        <span class="back-link" data-back="stepDate">&larr; Choose a different date</span>
+        <h3 class="step-title" id="timeStepTitle">Pick a Time</h3>
+        <div class="time-grid" id="timeGrid"></div>
+        <div class="waitlist-note">Can't find a suitable time? <button type="button" id="joinWaitlistBtn">Join Waitlist</button></div>
+      </div>
+
+      <div class="modal-step" id="stepDetails" hidden>
+        <span class="back-link" data-back="stepTime">&larr; Choose a different time</span>
+        <h3 class="step-title">Your Details</h3>
+        <div class="summary-box" id="summaryBox"></div>
+        <form id="detailsForm">
+          <div class="field"><label for="fName">Full name</label><input type="text" id="fName" required autocomplete="name"></div>
+          <div class="field"><label for="fEmail">Email</label><input type="email" id="fEmail" required autocomplete="email"></div>
+          <div class="field"><label for="fPhone">Phone</label><input type="tel" id="fPhone" required autocomplete="tel"></div>
+          <div class="field"><label for="fNotes">Texture &amp; notes (e.g. Body Wave or Straight)</label><textarea id="fNotes" rows="2"></textarea></div>
+          <div class="form-error" id="formError">Please fill in your name, email, and phone.</div>
+          <button type="submit" class="btn" style="width:100%;">Confirm Booking</button>
+        </form>
+      </div>
+
+      <div class="modal-step confirm-wrap" id="stepConfirm" hidden>
+        <div class="confirm-check">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#e9c9c4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3 class="step-title">You're Booked In</h3>
+        <div class="summary-box" id="confirmSummaryBox"></div>
+        <p style="font-family:var(--sans); font-size:12.5px; color:var(--ink-faint); line-height:1.7;">
+          A confirmation will follow by email. Please read through all policies before your appointment.
+        </p>
+        <div class="confirm-actions">
+          <button class="btn btn-outline" id="addToCalBtn" type="button">Add to My Calendar</button>
+          <button class="btn" id="closeConfirmBtn" type="button">Done</button>
+        </div>
+      </div>
+
+      <div class="modal-step confirm-wrap" id="stepWaitlist" hidden>
+        <h3 class="step-title">Join the Waitlist</h3>
+        <p style="font-family:var(--sans); font-size:13.5px; color:var(--ink-muted); line-height:1.7;">
+          If a spot opens up for this service, we'll text or email you first.
+        </p>
+        <form id="waitlistForm">
+          <div class="field"><label for="wName">Full name</label><input type="text" id="wName" required autocomplete="name"></div>
+          <div class="field"><label for="wEmail">Email</label><input type="email" id="wEmail" required autocomplete="email"></div>
+          <div class="field"><label for="wPhone">Phone</label><input type="tel" id="wPhone" required autocomplete="tel"></div>
+          <div class="field"><label for="wDate">Preferred date</label><input type="text" id="wDate" readonly></div>
+          <button type="submit" class="btn" style="width:100%;">Join Waitlist</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =====================================================================
+     WIRE-UP POINT: your Google Calendar backend
+     A static page can't call the Google Calendar API directly (that write
+     needs OAuth credentials that must live on a server). Once you have a
+     backend that returns busy times, accepts new bookings, and records
+     waitlist entries, set its URL here. Until then this runs in DEMO MODE.
+  ===================================================================== */
+  const BOOKING_ENDPOINT = null; // e.g. "https://your-backend.example.com/api/doneupbyrissa"
+
+  // Real studio hours (from the live Acuity page). 0=Sun..6=Sat.
+  const STUDIO_HOURS = {
+    0: null,
+    1: null,
+    2: [{ open: 12*60, close: 19*60 }],
+    3: [{ open: 10*60, close: 19*60 }],
+    4: [{ open: 10*60, close: 19*60 }],
+    5: [{ open: 10*60, close: 19*60 }],
+    6: [{ open: 10*60, close: 17*60 }],
+  };
+  const SLOT_INTERVAL = 30;
+  const LEAD_TIME_MIN = 180;
+  const DAYS_AHEAD = 21;
+
+  const SERVICES = {
+    "bundle-20-24":      { name: "20\"–24\" Bundle Set",        price: 495, duration: 150, bundleAddons:true },
+    "bundle-18-18-18":   { name: "18\" 18\" 18\" Bundle Set",   price: 380, duration: 150, bundleAddons:true },
+    "bundle-18-22":      { name: "18\"–22\" Bundle Set",        price: 465, duration: 150, bundleAddons:true },
+    "bundle-22-26":      { name: "22\"–26\" Bundle Set",        price: 525, duration: 150, bundleAddons:true },
+    "raw-wavy-181818":   { name: "18\" 18\" 18\" Raw Heiress Wavy", price: 692, duration: 180, bundleAddons:true },
+    "raw-wavy-202224":   { name: "20\" 22\" 24\" Raw Heiress Wavy", price: 779, duration: 180, bundleAddons:true },
+    "raw-wavy-242628":   { name: "24\" 26\" 28\" Raw Heiress Wavy", price: 884, duration: 180, bundleAddons:true },
+    "raw-curl-202224":   { name: "20\" 22\" 24\" Raw Heiress Curl", price: 798, duration: 180, bundleAddons:true },
+  };
+
+  const BUNDLE_ADDONS = {
+    "bundle20":  { name: "+1 Bundle 20\"", price: 95,  duration: 15 },
+    "bundle22":  { name: "+1 Bundle 22\"", price: 105, duration: 15 },
+    "bundle24":  { name: "+1 Bundle 24\"", price: 115, duration: 15 },
+    "closure18": { name: "2x6 Closure 18\"", price: 75, duration: 10 },
+    "closure20": { name: "2x6 Closure 20\"", price: 85, duration: 10 },
+  };
+  const UNIVERSAL_ADDONS = {
+    "morning-luxe": { name: "8AM Morning Luxe Appointment", price: 50, duration: 0 },
+    "after-hours":  { name: "5PM After Hours Appointment",  price: 65, duration: 0 },
+  };
+  function getAddon(id){ return BUNDLE_ADDONS[id] || UNIVERSAL_ADDONS[id]; }
+
+  function demoTakenSlots(dateStr){
+    const d = new Date(dateStr + "T00:00:00");
+    const day = d.getDate();
+    return day % 2 === 0 ? ["1:00 PM", "3:30 PM"] : ["12:00 PM"];
+  }
+
+  let state = { serviceId: null, addons: [], date: null, time: null };
+  const overlay = document.getElementById("bookingOverlay");
+  const dots = document.querySelectorAll(".step-progress .dot");
+
+  function setStep(n){
+    ["stepAddons","stepDate","stepTime","stepDetails","stepConfirm"].forEach((id, i) => {
+      document.getElementById(id).hidden = (i !== n - 1);
+    });
+    document.getElementById("stepWaitlist").hidden = true;
+    dots.forEach((dot, i) => dot.classList.toggle("done", i < n));
+  }
+  function pad(n){ return String(n).padStart(2, "0"); }
+  function dateKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+  function minutesToLabel(mins){
+    let h = Math.floor(mins / 60), m = mins % 60;
+    const ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12; if (h === 0) h = 12;
+    return `${h}:${pad(m)} ${ampm}`;
+  }
+  function totalDuration(){
+    const svc = SERVICES[state.serviceId];
+    return state.addons.reduce((sum, id) => sum + getAddon(id).duration, svc.duration);
+  }
+  function totalPrice(){
+    const svc = SERVICES[state.serviceId];
+    return state.addons.reduce((sum, id) => sum + getAddon(id).price, svc.price);
+  }
+
+  function openBooking(serviceId){
+    state = { serviceId, addons: [], date: null, time: null };
+    const svc = SERVICES[serviceId];
+    document.getElementById("modalServiceName").textContent = `${svc.name} · $${svc.price}`;
+    document.querySelectorAll('#stepAddons input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+    const bundleList = document.getElementById("bundleAddonList");
+    bundleList.innerHTML = "";
+    if (svc.bundleAddons){
+      Object.entries(BUNDLE_ADDONS).forEach(([id, a]) => {
+        const label = document.createElement("label");
+        label.className = "addon-item";
+        label.innerHTML = `<input type="checkbox" data-addon="${id}">
+          <div><div class="addon-name">${a.name}</div><div class="addon-meta">+${a.duration} min · $${a.price.toFixed(2)}</div></div>`;
+        bundleList.appendChild(label);
+      });
+    }
+
+    overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    setStep(1);
+  }
+  function closeBooking(){
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  document.getElementById("addonsContinue").addEventListener("click", () => {
+    state.addons = Array.from(document.querySelectorAll('#stepAddons input[type="checkbox"]:checked'))
+      .map(cb => cb.getAttribute("data-addon"));
+    renderDateRow();
+    setStep(2);
+  });
+
+  function renderDateRow(){
+    const row = document.getElementById("dateRow");
+    row.innerHTML = "";
+    const today = new Date();
+    for (let i = 0; i < DAYS_AHEAD; i++){
+      const d = new Date(today);
+      d.setDate(d.getDate() + i);
+      const key = dateKey(d);
+      const windows = STUDIO_HOURS[d.getDay()];
+      const chip = document.createElement("div");
+      chip.className = "date-chip" + (windows && windows.length ? "" : " closed");
+      chip.innerHTML = `<div class="dow">${d.toLocaleDateString(undefined,{weekday:"short"})}</div><div class="dom">${d.getDate()}</div>`;
+      if (windows && windows.length) chip.addEventListener("click", () => selectDate(key, chip));
+      row.appendChild(chip);
+    }
+  }
+  function selectDate(key, chipEl){
+    document.querySelectorAll(".date-chip").forEach(c => c.classList.remove("selected"));
+    if (chipEl) chipEl.classList.add("selected");
+    state.date = key;
+    renderTimeGrid();
+    setStep(3);
+  }
+  async function getTakenSlots(dateStr){
+    if (BOOKING_ENDPOINT){
+      // const res = await fetch(`${BOOKING_ENDPOINT}/availability?date=${dateStr}`);
+      // const data = await res.json();
+      // return data.taken;
+    }
+    return demoTakenSlots(dateStr);
+  }
+  async function renderTimeGrid(){
+    const grid = document.getElementById("timeGrid");
+    grid.innerHTML = `<div class="time-empty">Loading times…</div>`;
+    const duration = totalDuration();
+    const d = new Date(state.date + "T00:00:00");
+    const windows = STUDIO_HOURS[d.getDay()];
+    document.getElementById("timeStepTitle").textContent =
+      `Pick a Time — ${d.toLocaleDateString(undefined,{weekday:"long", month:"short", day:"numeric"})}`;
+    if (!windows || !windows.length){ grid.innerHTML = `<div class="time-empty">Closed that day — pick another date.</div>`; return; }
+
+    const taken = await getTakenSlots(state.date);
+    const now = new Date();
+    const isToday = dateKey(now) === state.date;
+    const nowMins = now.getHours() * 60 + now.getMinutes() + LEAD_TIME_MIN;
+
+    const slots = [];
+    windows.forEach(win => {
+      for (let t = win.open; t + duration <= win.close; t += SLOT_INTERVAL){
+        if (isToday && t < nowMins) continue;
+        slots.push(t);
+      }
+    });
+    if (!slots.length){ grid.innerHTML = `<div class="time-empty">No openings left that day — try another date.</div>`; return; }
+
+    grid.innerHTML = "";
+    slots.forEach(mins => {
+      const label = minutesToLabel(mins);
+      const isTaken = taken.includes(label);
+      const btn = document.createElement("div");
+      btn.className = "time-slot" + (isTaken ? " taken" : "");
+      btn.textContent = label;
+      if (!isTaken) btn.addEventListener("click", () => selectTime(mins, label, btn));
+      grid.appendChild(btn);
+    });
+  }
+  function selectTime(mins, label, btnEl){
+    document.querySelectorAll(".time-slot").forEach(b => b.classList.remove("selected"));
+    btnEl.classList.add("selected");
+    state.time = { mins, label };
+    renderSummary();
+    setStep(4);
+  }
+  function renderSummary(){
+    const svc = SERVICES[state.serviceId];
+    const d = new Date(state.date + "T00:00:00");
+    let rows = `
+      <div class="row"><span>Service</span><strong>${svc.name}</strong></div>
+      <div class="row"><span>Date</span><strong>${d.toLocaleDateString(undefined,{weekday:"short", month:"short", day:"numeric"})}</strong></div>
+      <div class="row"><span>Time</span><strong>${state.time.label}</strong></div>
+    `;
+    state.addons.forEach(id => {
+      const a = getAddon(id);
+      rows += `<div class="row"><span>${a.name}</span><strong>$${a.price}</strong></div>`;
+    });
+    rows += `<div class="row total"><span>Total</span><strong>$${totalPrice()}</strong></div>`;
+    document.getElementById("summaryBox").innerHTML = rows;
+  }
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function toICSDate(d){
+    return `${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
+  }
+  function buildICS(payload){
+    const svc = SERVICES[payload.serviceId];
+    const [y,mo,da] = payload.date.split("-").map(Number);
+    const start = new Date(y, mo-1, da, Math.floor(payload.time.mins/60), payload.time.mins % 60);
+    const end = new Date(start.getTime() + totalDuration() * 60000);
+    const uid = `rissa-${Date.now()}@doneupbyrissa`;
+    return [
+      "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Done Up by Rissa//Booking//EN",
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${toICSDate(new Date())}`,
+      `DTSTART:${toICSDate(start)}`,
+      `DTEND:${toICSDate(end)}`,
+      `SUMMARY:${svc.name} — Done Up by Rissa`,
+      `DESCRIPTION:Appointment for ${payload.name}.`,
+      "END:VEVENT","END:VCALENDAR"
+    ].join("\r\n");
+  }
+  async function submitBooking(payload){
+    if (BOOKING_ENDPOINT){
+      // await fetch(`${BOOKING_ENDPOINT}/bookings`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(payload)
+      // });
+    } else {
+      console.log("[DEMO MODE] booking captured — wire up BOOKING_ENDPOINT to send this to your calendar:", payload);
+    }
+  }
+  async function submitWaitlist(payload){
+    if (BOOKING_ENDPOINT){
+      // await fetch(`${BOOKING_ENDPOINT}/waitlist`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(payload)
+      // });
+    } else {
+      console.log("[DEMO MODE] waitlist entry captured:", payload);
+    }
+  }
+
+  document.getElementById("detailsForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("fName").value.trim();
+    const email = document.getElementById("fEmail").value.trim();
+    const phone = document.getElementById("fPhone").value.trim();
+    const notes = document.getElementById("fNotes").value.trim();
+    const errorEl = document.getElementById("formError");
+    if (!name || !email || !phone){ errorEl.classList.add("show"); return; }
+    errorEl.classList.remove("show");
+
+    const payload = { ...state, name, email, phone, notes };
+    await submitBooking(payload);
+    window.__lastBooking = payload;
+
+    const svc = SERVICES[state.serviceId];
+    const d = new Date(state.date + "T00:00:00");
+    let rows = `
+      <div class="row"><span>Service</span><strong>${svc.name}</strong></div>
+      <div class="row"><span>Date</span><strong>${d.toLocaleDateString(undefined,{weekday:"short", month:"short", day:"numeric"})}</strong></div>
+      <div class="row"><span>Time</span><strong>${state.time.label}</strong></div>
+      <div class="row total"><span>Total</span><strong>$${totalPrice()}</strong></div>
+    `;
+    document.getElementById("confirmSummaryBox").innerHTML = rows;
+    setStep(5);
+  });
+
+  document.getElementById("joinWaitlistBtn").addEventListener("click", () => {
+    const d = state.date ? new Date(state.date + "T00:00:00") : null;
+    document.getElementById("wDate").value = d ? d.toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"}) : "";
+    ["stepAddons","stepDate","stepTime","stepDetails","stepConfirm"].forEach(id => { document.getElementById(id).hidden = true; });
+    document.getElementById("stepWaitlist").hidden = false;
+  });
+
+  document.getElementById("waitlistForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("wName").value.trim();
+    const email = document.getElementById("wEmail").value.trim();
+    const phone = document.getElementById("wPhone").value.trim();
+    if (!name || !email || !phone) return;
+    await submitWaitlist({ serviceId: state.serviceId, date: state.date, name, email, phone });
+    document.getElementById("stepWaitlist").innerHTML = `
+      <h3 class="step-title">You're on the list</h3>
+      <p style="font-family:var(--sans); font-size:13.5px; color:var(--ink-muted); line-height:1.7;">We'll reach out the moment a spot opens up.</p>
+      <button class="btn" id="waitlistDoneBtn" type="button" style="width:100%; margin-top:10px;">Done</button>
+    `;
+    document.getElementById("waitlistDoneBtn").addEventListener("click", closeBooking);
+  });
+
+  document.getElementById("addToCalBtn").addEventListener("click", () => {
+    const payload = window.__lastBooking;
+    if (!payload) return;
+    const ics = buildICS(payload);
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "done-up-by-rissa-appointment.ics";
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("closeConfirmBtn").addEventListener("click", closeBooking);
+  document.getElementById("modalClose").addEventListener("click", closeBooking);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeBooking(); });
+  document.getElementById("changeService").addEventListener("click", closeBooking);
+  document.querySelectorAll(".back-link").forEach(el => {
+    el.addEventListener("click", () => {
+      const target = el.getAttribute("data-back");
+      setStep(target === "stepAddons" ? 1 : target === "stepDate" ? 2 : 3);
+    });
+  });
+  document.querySelectorAll(".select-btn").forEach(btn => {
+    btn.addEventListener("click", () => openBooking(btn.getAttribute("data-id")));
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && overlay.classList.contains("open")) closeBooking(); });
+
+  // ---- Scroll reveal ----
+  const revealEls = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting){
+          entry.target.classList.add("in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add("in"));
+  }
+})();
+</script>
+
+</body>
+</html>
+
