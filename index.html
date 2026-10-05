@@ -583,19 +583,18 @@
   // Service menu (mirrors the live Acuity page). The menu and the booking
   // modal both render from this list, so prices only need changing here.
   const HAIR_PKG_ADDONS = ["bundle20","bundle22","bundle24","closure18","closure20"];
-  const AHEAD_2_DAYS = "Book at least 2 days ahead";
   const CATEGORIES = [
     {
       name: "Hair Included Packages",
       note: "Premium virgin or raw hair bundles, included with your sew-in or quickweave service. Clients must specify a texture — Body Wave or Straight — in the booking notes; failure to do so defaults to Body Wave.",
       services: [
-        { id: "bundle-20-24",    name: "20\"–24\" Bundle Set",     price: 495, duration: 150, addons: HAIR_PKG_ADDONS, flag: AHEAD_2_DAYS,
+        { id: "bundle-20-24",    name: "20\"–24\" Bundle Set",     price: 495, duration: 150, addons: HAIR_PKG_ADDONS, minDaysNotice: 2,
           desc: "Luxury virgin bundle set in lengths 20\"–24\", paired with a sew-in or quickweave. Maintains its quality for 3–5 years, with long-lasting softness, fullness, and a luxury finish." },
-        { id: "bundle-18-18-18", name: "18\" 18\" 18\" Bundle Set", price: 380, duration: 150, addons: HAIR_PKG_ADDONS, flag: AHEAD_2_DAYS,
+        { id: "bundle-18-18-18", name: "18\" 18\" 18\" Bundle Set", price: 380, duration: 150, addons: HAIR_PKG_ADDONS, minDaysNotice: 2,
           desc: "Three premium virgin hair bundles at 18\", paired with a sew-in or quickweave. Long-lasting softness, fullness, and a luxury finish." },
-        { id: "bundle-18-22",    name: "18\"–22\" Bundle Set",     price: 465, duration: 150, addons: HAIR_PKG_ADDONS, flag: AHEAD_2_DAYS,
+        { id: "bundle-18-22",    name: "18\"–22\" Bundle Set",     price: 465, duration: 150, addons: HAIR_PKG_ADDONS, minDaysNotice: 2,
           desc: "Premium virgin hair bundles in lengths 18\"–22\", paired with a sew-in or quickweave. Long-lasting softness, fullness, and a luxury finish." },
-        { id: "bundle-22-26",    name: "22\"–26\" Bundle Set",     price: 525, duration: 150, addons: HAIR_PKG_ADDONS, flag: AHEAD_2_DAYS,
+        { id: "bundle-22-26",    name: "22\"–26\" Bundle Set",     price: 525, duration: 150, addons: HAIR_PKG_ADDONS, minDaysNotice: 2,
           desc: "Premium virgin hair bundles in lengths 22\"–26\", paired with a sew-in or quickweave. Select add-ons at checkout." },
         { id: "raw-wavy-181818", name: "18\" 18\" 18\" Raw Heiress Wavy", price: 692, duration: 180, addons: HAIR_PKG_ADDONS,
           desc: "Thick, full raw bundles sourced directly from single donors, with a natural hair wash and stretch, finished with your choice of sew-in or quickweave. Incredibly versatile — wear it in its natural soft wave, straighten it sleek, or curl it for voluminous glam." },
@@ -728,6 +727,7 @@
                 <div class="svc-right"><span class="svc-price">$${svc.price}</span><button class="select-btn" data-id="${svc.id}">Select</button></div>
               </div>
               ${svc.desc ? `<p class="svc-desc">${escapeHTML(svc.desc)}</p>` : ""}
+              ${svc.minDaysNotice ? `<span class="svc-flag">Book at least ${svc.minDaysNotice} days ahead</span>` : ""}
               ${svc.flag ? `<span class="svc-flag">${escapeHTML(svc.flag)}</span>` : ""}
             </div>`).join("")}
         </div>
