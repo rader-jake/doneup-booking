@@ -270,7 +270,7 @@
   @media (min-width:420px){ .time-grid{ grid-template-columns:repeat(4,1fr); } }
   .time-slot{
     padding:10px 4px; text-align:center; border:1px solid var(--hairline); border-radius:4px;
-    background:var(--surface-2); color:var(--ink); font-size:12.5px; cursor:pointer;
+    background:var(--surface-2); color:var(--ink); font-size:12.5px; cursor:pointer; font-family:inherit;
   }
   .time-slot:hover{ border-color:var(--rose-soft); }
   .time-slot.selected{ border-color:var(--rose); background:var(--rose); color:var(--bg); }
@@ -325,6 +325,13 @@
     display:flex; align-items:center; justify-content:center;
   }
   .deposit-warning{ font-family:var(--sans); font-size:12px; color:var(--rose); line-height:1.6; margin:14px 0 0; text-align:center; }
+  .time-notice{
+    font-family:var(--sans); font-size:12.5px; line-height:1.6; color:var(--ink);
+    border:1px solid var(--rose-soft); background:rgba(233,201,196,0.08); border-radius:4px;
+    padding:11px 14px; margin:0 0 14px;
+  }
+  .link-btn{ background:none; border:none; padding:0; color:var(--ink-faint); text-decoration:underline; text-underline-offset:2px; cursor:pointer; font-family:var(--sans); font-size:12px; }
+  .link-btn:hover{ color:var(--rose); }
   .demo-note{ font-family:var(--sans); font-size:11px; color:var(--ink-faint); margin-top:10px; text-align:center; }
   .btn[aria-disabled="true"], .btn:disabled{ opacity:0.55; cursor:not-allowed; transform:none; }
 </style>
@@ -364,7 +371,7 @@
           <summary>Deposits<span class="plus">+</span></summary>
           <div class="acc-body">
             <p>Every appointment requires <span data-deposit-phrase>a deposit</span> to secure your spot.</p>
-            <p>After you choose your service, date, and time, you'll get a secure payment link. Your appointment is only confirmed once the deposit is paid — until then, the time can still be booked by someone else.</p>
+            <p>After you choose your service, date, and time, you'll get a secure payment link. Your appointment is only confirmed once the deposit is paid. We hold your chosen time briefly while you pay; if the deposit isn't completed in time, the slot is released to other clients.</p>
           </div>
         </details>
 
@@ -466,6 +473,7 @@
       <div class="modal-step" id="stepTime" hidden>
         <span class="back-link" data-back="stepDate">&larr; Choose a different date</span>
         <h3 class="step-title" id="timeStepTitle">Pick a Time</h3>
+        <div class="time-notice" id="timeNotice" hidden></div>
         <div class="time-grid" id="timeGrid"></div>
         <div class="waitlist-note">Can't find a suitable time? <button type="button" id="joinWaitlistBtn">Join Waitlist</button></div>
       </div>
@@ -491,12 +499,12 @@
         <div class="hold-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#e9c9c4" stroke-width="1.8"/><path d="M12 7.5V12l3 2" stroke="#e9c9c4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <h3 class="step-title">One Last Step — Pay Your Deposit</h3>
-        <p style="font-family:var(--sans); font-size:13px; color:var(--ink-muted); line-height:1.7; margin:-6px 0 16px;">
+        <h3 class="step-title" id="confirmTitle">One Last Step — Pay Your Deposit</h3>
+        <p id="confirmLead" style="font-family:var(--sans); font-size:13px; color:var(--ink-muted); line-height:1.7; margin:-6px 0 16px;">
           Your appointment is <strong style="color:var(--ink);">not booked yet</strong>. Pay your deposit to secure this time.
         </p>
         <div class="summary-box" id="confirmSummaryBox"></div>
-        <ol class="deposit-steps">
+        <ol class="deposit-steps" id="depositSteps">
           <li>Tap the button below to open the secure Square payment page.</li>
           <li>Pay <span data-deposit-phrase>your deposit</span>.</li>
           <li>Once it's paid, your appointment is confirmed and you'll get a confirmation by text or email.</li>
@@ -505,8 +513,9 @@
           <a class="btn" id="payDepositBtn" href="#" target="_blank" rel="noopener">Pay Deposit &amp; Secure My Spot</a>
           <button class="btn btn-outline" id="closeConfirmBtn" type="button">I've Paid — Close</button>
         </div>
-        <p class="deposit-warning">Until your deposit is paid, this time isn't reserved and can still be booked by someone else.</p>
-        <p class="demo-note" id="depositDemoNote" hidden>Demo mode — the real Square deposit link will appear here once the booking backend is connected.</p>
+        <p class="deposit-warning" id="holdNotice"></p>
+        <p class="demo-note" id="depositDemoNote" hidden>Online deposit payment isn't switched on yet — the secure Square link will appear here once it is.</p>
+        <p style="text-align:center; margin:16px 0 0;"><button type="button" class="link-btn" id="releaseHoldBtn">Changed your mind? Release this time</button></p>
       </div>
 
       <div class="modal-step confirm-wrap" id="stepWaitlist" hidden>
@@ -514,12 +523,18 @@
         <p style="font-family:var(--sans); font-size:13.5px; color:var(--ink-muted); line-height:1.7;">
           If a spot opens up for this service, we'll text or email you first.
         </p>
+        <div id="waitlistDone" hidden>
+          <h3 class="step-title">You're on the list</h3>
+          <p style="font-family:var(--sans); font-size:13.5px; color:var(--ink-muted); line-height:1.7;">We'll reach out the moment a spot opens up.</p>
+          <button class="btn" id="waitlistDoneBtn" type="button" style="width:100%; margin-top:10px;">Done</button>
+        </div>
         <form id="waitlistForm">
           <div class="field"><label for="wName">Full name</label><input type="text" id="wName" required autocomplete="name"></div>
           <div class="field"><label for="wEmail">Email</label><input type="email" id="wEmail" required autocomplete="email"></div>
           <div class="field"><label for="wPhone">Phone</label><input type="tel" id="wPhone" required autocomplete="tel"></div>
           <div class="field"><label for="wDate">Preferred date</label><input type="text" id="wDate" readonly></div>
-          <button type="submit" class="btn" style="width:100%;">Join Waitlist</button>
+          <div class="form-error" id="waitlistError"></div>
+          <button type="submit" class="btn" id="waitlistSubmit" style="width:100%;">Join Waitlist</button>
         </form>
       </div>
 
@@ -531,15 +546,20 @@
   "use strict";
 
   /* =====================================================================
-     WIRE-UP POINT: your Google Calendar backend
-     A static page can't call the Google Calendar API directly (that write
-     needs OAuth credentials that must live on a server). Once you have a
-     backend that returns busy times, accepts new bookings, and records
-     waitlist entries, set its URL here. Until then this runs in DEMO MODE.
+     BOOKING API — the one setting to change per environment.
+     The backend (booking-platform) owns availability, pricing, and bookings.
+     Local preview talks to `npm run dev` on port 3000.
+     TODO: replace null with the Railway URL once deployed.
+     If this is null or the API is down, the menu still renders and the
+     booking modal shows a clear "online booking unavailable" fallback.
   ===================================================================== */
-  const BOOKING_ENDPOINT = null; // e.g. "https://your-backend.example.com/api/doneupbyrissa"
+  const API_BASE_URL = ["localhost", "127.0.0.1"].includes(location.hostname) ? "http://localhost:3000" : null;
+  const TENANT_SLUG = "doneupbyrissa";
+  const BOOKING_ENDPOINT = API_BASE_URL ? `${API_BASE_URL}/api/${TENANT_SLUG}` : null;
+  const OFFLINE_MESSAGE = "Online booking is temporarily unavailable. Please text or DM us to book, or try again in a few minutes.";
 
-  // Real studio hours (from the live Acuity page). 0=Sun..6=Sat.
+  // Studio hours (from the live Acuity page). 0=Sun..6=Sat. Used here only to grey out
+  // closed days; the backend seed reads this block and enforces the real rules.
   const STUDIO_HOURS = {
     0: null,
     1: null,
@@ -552,6 +572,7 @@
   // Deposit shown to clients. The backend's Square link is what actually
   // charges it, so keep the two in sync.
   const DEPOSIT_AMOUNT = 50;
+  // Read by the backend seed (slot grid, minimum lead time). Not used in the browser.
   const SLOT_INTERVAL = 30;
   const LEAD_TIME_MIN = 180;
   const DAYS_AHEAD = 21;
@@ -741,13 +762,40 @@
     });
   }
 
-  function demoTakenSlots(dateStr){
-    const d = new Date(dateStr + "T00:00:00");
-    const day = d.getDate();
-    return day % 2 === 0 ? ["1:00 PM", "3:30 PM"] : ["12:00 PM"];
-  }
+  let state = { serviceId: null, addons: [], date: null, time: null, booking: null, cancelToken: null };
+  let salonTimeZone = "America/New_York"; // replaced by the API's answer
+  let timeRequestSeq = 0;
 
-  let state = { serviceId: null, addons: [], date: null, time: null };
+  class ApiError extends Error {
+    constructor(status, code, message){ super(message); this.status = status; this.code = code; }
+  }
+  async function api(path, options = {}){
+    if (!BOOKING_ENDPOINT) throw new ApiError(0, "NOT_CONFIGURED", OFFLINE_MESSAGE);
+    let res;
+    try {
+      res = await fetch(`${BOOKING_ENDPOINT}${path}`, {
+        ...options,
+        headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), ...(options.headers || {}) },
+      });
+    } catch (err) {
+      throw new ApiError(0, "NETWORK", OFFLINE_MESSAGE);
+    }
+    let data = null;
+    try { data = await res.json(); } catch (err) { /* empty or non-JSON body */ }
+    if (!res.ok){
+      const e = (data && data.error) || {};
+      const message = res.status >= 500 ? OFFLINE_MESSAGE : (e.message || "Something went wrong. Please try again.");
+      throw new ApiError(res.status, e.code || "ERROR", message);
+    }
+    return data;
+  }
+  function formatSalonTime(iso){
+    return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: salonTimeZone });
+  }
+  function formatSalonDate(iso, opts = { weekday: "short", month: "short", day: "numeric" }){
+    return new Date(iso).toLocaleDateString("en-US", { ...opts, timeZone: salonTimeZone });
+  }
+  const money = (cents) => `$${(cents / 100).toFixed(cents % 100 ? 2 : 0)}`;
   const overlay = document.getElementById("bookingOverlay");
   const dots = document.querySelectorAll(".step-progress .dot");
 
@@ -760,23 +808,14 @@
   }
   function pad(n){ return String(n).padStart(2, "0"); }
   function dateKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-  function minutesToLabel(mins){
-    let h = Math.floor(mins / 60), m = mins % 60;
-    const ampm = h >= 12 ? "PM" : "AM";
-    h = h % 12; if (h === 0) h = 12;
-    return `${h}:${pad(m)} ${ampm}`;
-  }
-  function totalDuration(){
-    const svc = SERVICES[state.serviceId];
-    return state.addons.reduce((sum, id) => sum + getAddon(id).duration, svc.duration);
-  }
   function totalPrice(){
     const svc = SERVICES[state.serviceId];
     return state.addons.reduce((sum, id) => sum + getAddon(id).price, svc.price);
   }
 
   function openBooking(serviceId){
-    state = { serviceId, addons: [], date: null, time: null };
+    state = { serviceId, addons: [], date: null, time: null, booking: null, cancelToken: null };
+    showTimeNotice("");
     const svc = SERVICES[serviceId];
     document.getElementById("modalServiceName").textContent = `${svc.name} · $${svc.price}`;
     document.querySelectorAll('#stepAddons input[type="checkbox"]').forEach(cb => cb.checked = false);
@@ -831,56 +870,56 @@
     document.querySelectorAll(".date-chip").forEach(c => c.classList.remove("selected"));
     if (chipEl) chipEl.classList.add("selected");
     state.date = key;
+    showTimeNotice("");
     renderTimeGrid();
     setStep(3);
   }
-  async function getTakenSlots(dateStr){
-    if (BOOKING_ENDPOINT){
-      // const res = await fetch(`${BOOKING_ENDPOINT}/availability?date=${dateStr}`);
-      // const data = await res.json();
-      // return data.taken;
-    }
-    return demoTakenSlots(dateStr);
+  function showTimeNotice(message){
+    const el = document.getElementById("timeNotice");
+    el.textContent = message || "";
+    el.hidden = !message;
   }
   async function renderTimeGrid(){
     const grid = document.getElementById("timeGrid");
-    grid.innerHTML = `<div class="time-empty">Loading times…</div>`;
-    const duration = totalDuration();
+    const seq = ++timeRequestSeq;
     const d = new Date(state.date + "T00:00:00");
-    const windows = STUDIO_HOURS[d.getDay()];
     document.getElementById("timeStepTitle").textContent =
       `Pick a Time — ${d.toLocaleDateString(undefined,{weekday:"long", month:"short", day:"numeric"})}`;
-    if (!windows || !windows.length){ grid.innerHTML = `<div class="time-empty">Closed that day — pick another date.</div>`; return; }
+    grid.innerHTML = `<div class="time-empty">Loading times…</div>`;
 
-    const taken = await getTakenSlots(state.date);
-    const now = new Date();
-    const isToday = dateKey(now) === state.date;
-    const nowMins = now.getHours() * 60 + now.getMinutes() + LEAD_TIME_MIN;
+    const params = new URLSearchParams({ date: state.date, serviceId: state.serviceId });
+    if (state.addons.length) params.set("addons", state.addons.join(","));
+    let data;
+    try {
+      data = await api(`/availability?${params}`);
+    } catch (err) {
+      if (seq !== timeRequestSeq) return;
+      grid.innerHTML = `<div class="time-empty">${escapeHTML(err.message)}</div>`;
+      return;
+    }
+    if (seq !== timeRequestSeq) return; // a newer date was picked meanwhile
+    salonTimeZone = data.timezone;
 
-    const slots = [];
-    windows.forEach(win => {
-      for (let t = win.open; t + duration <= win.close; t += SLOT_INTERVAL){
-        if (isToday && t < nowMins) continue;
-        slots.push(t);
-      }
-    });
-    if (!slots.length){ grid.innerHTML = `<div class="time-empty">No openings left that day — try another date.</div>`; return; }
-
+    if (!data.slots.length){
+      grid.innerHTML = `<div class="time-empty">No openings that day — try another date or join the waitlist.</div>`;
+      return;
+    }
     grid.innerHTML = "";
-    slots.forEach(mins => {
-      const label = minutesToLabel(mins);
-      const isTaken = taken.includes(label);
-      const btn = document.createElement("div");
-      btn.className = "time-slot" + (isTaken ? " taken" : "");
+    data.slots.forEach(startsAt => {
+      const label = formatSalonTime(startsAt);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "time-slot";
       btn.textContent = label;
-      if (!isTaken) btn.addEventListener("click", () => selectTime(mins, label, btn));
+      btn.addEventListener("click", () => selectTime(startsAt, label, btn));
       grid.appendChild(btn);
     });
   }
-  function selectTime(mins, label, btnEl){
+  function selectTime(startsAt, label, btnEl){
     document.querySelectorAll(".time-slot").forEach(b => b.classList.remove("selected"));
     btnEl.classList.add("selected");
-    state.time = { mins, label };
+    state.time = { startsAt, label };
+    showTimeNotice("");
     renderSummary();
     setStep(4);
   }
@@ -905,33 +944,17 @@
     return `<div class="row deposit"><span>Deposit due now to book</span><strong>$${DEPOSIT_AMOUNT}</strong></div>
       <div class="row"><span>Balance due at appointment</span><strong>$${Math.max(totalPrice() - DEPOSIT_AMOUNT, 0)}</strong></div>`;
   }
-  // Creates the pending booking + Square deposit link. The backend should only
-  // put the appointment on the calendar once Square confirms the payment
-  // (webhook), same as the Pure Vision flow. Expected response: { deposit_url }.
-  async function submitBooking(payload){
-    if (BOOKING_ENDPOINT){
-      const res = await fetch(`${BOOKING_ENDPOINT}/bookings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!res.ok || !data.deposit_url) throw new Error("No deposit link returned");
-      return data.deposit_url;
-    }
-    console.log("[DEMO MODE] pending booking captured — wire up BOOKING_ENDPOINT to create the Square deposit link:", payload);
-    return null;
+  // The server recomputes price and duration; only ids, the start, and contact details are sent.
+  // TODO(phase 2): the response will include a Square depositUrl for pending bookings.
+  function submitBooking(payload){
+    return api("/bookings", { method: "POST", body: JSON.stringify(payload) });
   }
-  async function submitWaitlist(payload){
-    if (BOOKING_ENDPOINT){
-      // await fetch(`${BOOKING_ENDPOINT}/waitlist`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(payload)
-      // });
-    } else {
-      console.log("[DEMO MODE] waitlist entry captured:", payload);
-    }
+  function submitWaitlist(payload){
+    return api("/waitlist", { method: "POST", body: JSON.stringify(payload) });
+  }
+  function releaseHold(){
+    const { booking, cancelToken } = state;
+    return api(`/bookings/${encodeURIComponent(booking.id)}?token=${encodeURIComponent(cancelToken)}`, { method: "DELETE" });
   }
 
   document.getElementById("detailsForm").addEventListener("submit", async (e) => {
@@ -948,51 +971,103 @@
     const cleanPhone = phone.replace(/[\s().-]/g, "");
     const formattedPhone = cleanPhone.startsWith("+") ? cleanPhone : `+1${cleanPhone}`;
     const payload = {
-      ...state, name, email, phone: formattedPhone, notes,
-      serviceName: SERVICES[state.serviceId].name,
-      totalPrice: totalPrice(), totalDuration: totalDuration(), depositAmount: DEPOSIT_AMOUNT,
+      serviceId: state.serviceId,
+      addons: state.addons,
+      startsAt: state.time.startsAt,
+      name, email, phone: formattedPhone,
+      notes: notes || undefined,
     };
 
     const submitBtn = document.getElementById("detailsSubmit");
     submitBtn.disabled = true;
-    submitBtn.textContent = "Creating your deposit link…";
-    let depositUrl;
+    submitBtn.textContent = "Holding your time…";
+    let result;
     try {
-      depositUrl = await submitBooking(payload);
+      result = await submitBooking(payload);
     } catch (err) {
-      errorEl.textContent = "Something went wrong creating your deposit link. Please try again or text us directly.";
+      if (err.status === 409){
+        showTimeNotice("That time was just taken — please pick another.");
+        state.time = null;
+        setStep(3);
+        renderTimeGrid();
+        return;
+      }
+      errorEl.textContent = err.message;
       errorEl.classList.add("show");
       return;
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Continue to Deposit";
     }
+    state.booking = result.booking;
+    state.cancelToken = result.cancelToken;
+    renderConfirm(result.booking);
+    setStep(5);
+  });
 
-    const svc = SERVICES[state.serviceId];
-    const d = new Date(state.date + "T00:00:00");
-    document.getElementById("confirmSummaryBox").innerHTML = `
-      <div class="row"><span>Service</span><strong>${svc.name}</strong></div>
-      <div class="row"><span>Date</span><strong>${d.toLocaleDateString(undefined,{weekday:"short", month:"short", day:"numeric"})}</strong></div>
-      <div class="row"><span>Time</span><strong>${state.time.label}</strong></div>
-      <div class="row total"><span>Total</span><strong>$${totalPrice()}</strong></div>
-      ${depositRows()}
+  function renderConfirm(booking){
+    const pending = booking.status === "pending_deposit";
+    let rows = `
+      <div class="row"><span>Service</span><strong>${escapeHTML(booking.service.name)}</strong></div>
+      <div class="row"><span>Date</span><strong>${formatSalonDate(booking.startsAt)}</strong></div>
+      <div class="row"><span>Time</span><strong>${formatSalonTime(booking.startsAt)}</strong></div>
     `;
+    booking.addons.forEach(a => {
+      rows += `<div class="row"><span>${escapeHTML(a.name)}</span><strong>${money(a.priceCents)}</strong></div>`;
+    });
+    rows += `<div class="row total"><span>Total</span><strong>${money(booking.totalPriceCents)}</strong></div>`;
+    if (booking.depositCents){
+      rows += `<div class="row deposit"><span>Deposit due now to book</span><strong>${money(booking.depositCents)}</strong></div>
+        <div class="row"><span>Balance due at appointment</span><strong>${money(Math.max(booking.totalPriceCents - booking.depositCents, 0))}</strong></div>`;
+    }
+    document.getElementById("confirmSummaryBox").innerHTML = rows;
+
+    document.getElementById("confirmTitle").textContent = pending ? "One Last Step — Pay Your Deposit" : "You're Booked In";
+    document.getElementById("confirmLead").hidden = !pending;
+    document.getElementById("depositSteps").hidden = !pending;
+    document.getElementById("holdNotice").textContent = pending && booking.holdExpiresAt
+      ? `We're holding this time for you until ${formatSalonTime(booking.holdExpiresAt)}. If the deposit isn't paid by then, the time is released to other clients.`
+      : "";
+
     const payBtn = document.getElementById("payDepositBtn");
-    if (depositUrl){
-      payBtn.href = depositUrl;
+    payBtn.hidden = !pending;
+    if (booking.depositUrl){
+      payBtn.href = booking.depositUrl;
       payBtn.removeAttribute("aria-disabled");
     } else {
       payBtn.removeAttribute("href");
       payBtn.setAttribute("aria-disabled", "true");
     }
-    document.getElementById("depositDemoNote").hidden = !!depositUrl;
-    setStep(5);
+    document.getElementById("depositDemoNote").hidden = !pending || !!booking.depositUrl;
+    document.getElementById("closeConfirmBtn").textContent = pending ? "I've Paid — Close" : "Done";
+    const releaseBtn = document.getElementById("releaseHoldBtn");
+    releaseBtn.hidden = !pending;
+    releaseBtn.disabled = false;
+    releaseBtn.textContent = "Changed your mind? Release this time";
+  }
+
+  document.getElementById("releaseHoldBtn").addEventListener("click", async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.textContent = "Releasing…";
+    try {
+      await releaseHold();
+      btn.textContent = "Released — this time is open again.";
+      document.getElementById("payDepositBtn").hidden = true;
+      document.getElementById("holdNotice").textContent = "";
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = "Couldn't release it — tap to try again";
+    }
   });
 
   document.getElementById("joinWaitlistBtn").addEventListener("click", () => {
     const d = state.date ? new Date(state.date + "T00:00:00") : null;
     document.getElementById("wDate").value = d ? d.toLocaleDateString(undefined,{weekday:"long", month:"long", day:"numeric"}) : "";
     ["stepAddons","stepDate","stepTime","stepDetails","stepConfirm"].forEach(id => { document.getElementById(id).hidden = true; });
+    document.getElementById("waitlistForm").hidden = false;
+    document.getElementById("waitlistDone").hidden = true;
+    document.getElementById("waitlistError").classList.remove("show");
     document.getElementById("stepWaitlist").hidden = false;
   });
 
@@ -1001,15 +1076,32 @@
     const name = document.getElementById("wName").value.trim();
     const email = document.getElementById("wEmail").value.trim();
     const phone = document.getElementById("wPhone").value.trim();
-    if (!name || !email || !phone) return;
-    await submitWaitlist({ serviceId: state.serviceId, date: state.date, name, email, phone });
-    document.getElementById("stepWaitlist").innerHTML = `
-      <h3 class="step-title">You're on the list</h3>
-      <p style="font-family:var(--sans); font-size:13.5px; color:var(--ink-muted); line-height:1.7;">We'll reach out the moment a spot opens up.</p>
-      <button class="btn" id="waitlistDoneBtn" type="button" style="width:100%; margin-top:10px;">Done</button>
-    `;
-    document.getElementById("waitlistDoneBtn").addEventListener("click", closeBooking);
+    const errorEl = document.getElementById("waitlistError");
+    if (!name || !email || !phone){
+      errorEl.textContent = "Please fill in your name, email, and phone.";
+      errorEl.classList.add("show");
+      return;
+    }
+    errorEl.classList.remove("show");
+    const submitBtn = document.getElementById("waitlistSubmit");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Joining…";
+    try {
+      await submitWaitlist({ serviceId: state.serviceId, date: state.date, name, email, phone });
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.classList.add("show");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Join Waitlist";
+      return;
+    }
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Join Waitlist";
+    document.getElementById("waitlistForm").reset();
+    document.getElementById("waitlistForm").hidden = true;
+    document.getElementById("waitlistDone").hidden = false;
   });
+  document.getElementById("waitlistDoneBtn").addEventListener("click", closeBooking);
 
   document.getElementById("closeConfirmBtn").addEventListener("click", closeBooking);
   document.getElementById("modalClose").addEventListener("click", closeBooking);
