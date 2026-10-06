@@ -548,12 +548,13 @@
   /* =====================================================================
      BOOKING API — the one setting to change per environment.
      The backend (booking-platform) owns availability, pricing, and bookings.
-     Local preview talks to `npm run dev` on port 3000.
-     TODO: replace null with the Railway URL once deployed.
-     If this is null or the API is down, the menu still renders and the
+     Local preview talks to `npm run dev` on port 3000; everywhere else uses
+     the Railway API. If the API is down, the menu still renders and the
      booking modal shows a clear "online booking unavailable" fallback.
   ===================================================================== */
-  const API_BASE_URL = ["localhost", "127.0.0.1"].includes(location.hostname) ? "http://localhost:3000" : null;
+  const API_BASE_URL = ["localhost", "127.0.0.1"].includes(location.hostname)
+    ? "http://localhost:3000"
+    : "https://booking-platform-production-8a9b.up.railway.app";
   const TENANT_SLUG = "doneupbyrissa";
   const BOOKING_ENDPOINT = API_BASE_URL ? `${API_BASE_URL}/api/${TENANT_SLUG}` : null;
   const OFFLINE_MESSAGE = "Online booking is temporarily unavailable. Please text or DM us to book, or try again in a few minutes.";
